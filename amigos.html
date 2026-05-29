@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Amigos Steinkjer — Ekte meksikansk street food</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Karla:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    :root {
+      --red:       #DC2626;
+      --red-dark:  #991B1B;
+      --red-light: #FCA5A5;
+      --green:     #16A34A;
+      --green-dk:  #14532D;
+      --green-lt:  #4ADE80;
+      --yellow:    #F59E0B;
+      --yellow-dk: #B45309;
+      --yellow-lt: #FCD34D;
+      --black:     #0E0700;
+      --black-2:   #160C02;
+      --black-3:   #1E1005;
+      --grey:      #362010;
+      --grey-2:    #503018;
+      --muted:     #8B6440;
+      --muted-lt:  #B89068;
+      --text:      #FAF0E6;
+      --text-2:    #E8D5C0;
+      --white:     #FFF8F0;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: 'Karla', sans-serif;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── CURSOR ── */
+    #cursor {
+      position: fixed; width: 11px; height: 11px;
+      background: var(--red); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%,-50%);
+      transition: width .25s, height .25s, background .25s;
+      mix-blend-mode: exclusion;
+    }
+    #cursor-ring {
+      position: fixed; width: 38px; height: 38px;
+      border: 1.5px solid rgba(220,38,38,.4);
+      border-radius: 50%; pointer-events: none; z-index: 9998;
+      transform: translate(-50%,-50%);
+      transition: left .13s ease, top .13s ease, width .25s, height .25s;
+    }
+    body.cg #cursor  { width: 56px; height: 56px; background: var(--yellow); }
+    body.cg #cursor-ring { width: 72px; height: 72px; border-color: rgba(245,158,11,.4); }
+
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--red); }
+
+    /* ── SUBTLE TILE TEXTURE ── */
+    .textured {
+      background-image:
+        linear-gradient(45deg, rgba(220,38,38,.025) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(220,38,38,.025) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(220,38,38,.025) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(220,38,38,.025) 75%);
+      background-size: 24px 24px;
+      background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+    }
+
+    /* ── REVEAL ── */
+    .reveal {
+      opacity: 0; transform: translateY(52px);
+      transition: opacity .85s cubic-bezier(.16,1,.3,1), transform .85s cubic-bezier(.16,1,.3,1);
+    }
+    .reveal.on { opacity: 1; transform: translateY(0); }
+    .d1{transition-delay:.1s} .d2{transition-delay:.2s} .d3{transition-delay:.3s}
+    .d4{transition-delay:.4s} .d5{transition-delay:.5s}
+    .reveal-l { opacity:0; transform:translateX(-64px); transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1); }
+    .reveal-l.on { opacity:1; transform:translateX(0); }
+    .reveal-r { opacity:0; transform:translateX(64px); transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1); }
+    .reveal-r.on { opacity:1; transform:translateX(0); }
+    .img-wipe { clip-path:inset(0 100% 0 0); transition:clip-path 1.1s cubic-bezier(.77,0,.18,1); }
+    .img-wipe.on { clip-path:inset(0 0% 0 0); }
+
+    /* ── TRICOLOR BAR ── */
+    .tricolor {
+      display: flex; width: 100%; height: 4px;
+    }
+    .tricolor .tc-g { flex:1; background: var(--green); }
+    .tricolor .tc-w { flex:1; background: rgba(255,248,240,.7); }
+    .tricolor .tc-r { flex:1; background: var(--red); }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 74px;
+      transition: background .35s, box-shadow .35s;
+    }
+    nav.scrolled {
+      background: rgba(14,7,0,.96);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 1px 0 rgba(220,38,38,.2);
+    }
+
+    .nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; cursor:none; }
+    .logo-icon {
+      width: 38px; height: 38px; border-radius: 50%;
+      border: 2px solid var(--yellow);
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(245,158,11,.1);
+    }
+    .logo-icon svg { width: 20px; height: 20px; color: var(--yellow); }
+    .logo-txt {
+      font-family: 'Oswald', sans-serif; font-weight: 700;
+      font-size: 22px; letter-spacing: 3px; text-transform: uppercase;
+    }
+    .logo-txt .r { color: var(--red); }
+    .logo-txt .g { color: var(--green); }
+    .logo-txt .y { color: var(--yellow); }
+
+    .nav-links { display:flex; align-items:center; gap:32px; list-style:none; }
+    .nav-links a {
+      font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 500;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted-lt); text-decoration: none; cursor: none;
+      transition: color .2s; position: relative;
+    }
+    .nav-links a::after {
+      content:''; position:absolute; bottom:-3px; left:0; right:0;
+      height:1px; background:var(--yellow);
+      transform:scaleX(0); transform-origin:left; transition:transform .25s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after { transform:scaleX(1); }
+
+    .nav-cta {
+      font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase;
+      background: var(--red); color: white;
+      padding: 11px 26px; border-radius: 4px;
+      text-decoration: none; cursor: none;
+      transition: background .2s, transform .2s;
+    }
+    .nav-cta:hover { background: var(--red-dark); transform: translateY(-2px); }
+
+    .burger { display:none; flex-direction:column; gap:5px; cursor:none; background:none; border:none; padding:8px; }
+    .burger span { display:block; width:22px; height:2px; background: var(--text); transition:all .3s; }
+
+    .mob-nav {
+      display:none; position:fixed; inset:0;
+      background:var(--black-2); z-index:99;
+      flex-direction:column; align-items:center; justify-content:center; gap:32px;
+    }
+    .mob-nav.open { display:flex; }
+    .mob-nav a {
+      font-family:'Oswald',sans-serif; font-size:52px; font-weight:700;
+      letter-spacing:4px; text-transform:uppercase; text-decoration:none; cursor:none;
+      transition:color .2s;
+    }
+    .mob-nav a:nth-child(1) { color: var(--green); }
+    .mob-nav a:nth-child(2) { color: var(--yellow); }
+    .mob-nav a:nth-child(3) { color: var(--red); }
+    .mob-nav a:nth-child(4) { color: var(--green); }
+    .mob-nav a:nth-child(5) { color: var(--yellow); }
+    .mob-nav a:hover { opacity: .75; }
+
+    /* ── HERO ── */
+    #hero { position:relative; height:100vh; min-height:680px; overflow:hidden; }
+
+    /* Mexican-flag tricolor vertical bars on hero */
+    .hero-flag {
+      position:absolute; top:0; left:0; bottom:0; z-index:3;
+      display:flex; width:6px; flex-direction:column;
+    }
+    .hero-flag .hf-g { flex:1; background: var(--green); }
+    .hero-flag .hf-w { flex:1; background: rgba(255,248,240,.6); }
+    .hero-flag .hf-r { flex:1; background: var(--red); }
+
+    .hero-bg { position:absolute; inset:0; z-index:0; }
+    .hero-bg img {
+      width:100%; height:100%; object-fit:cover; object-position:center;
+      transform:scale(1.08);
+      transition:transform 9s cubic-bezier(.25,.46,.45,.94);
+      filter: brightness(.55) saturate(1.2);
+    }
+    #hero.on .hero-bg img { transform:scale(1); }
+    .hero-overlay {
+      position:absolute; inset:0;
+      background: linear-gradient(
+        160deg,
+        rgba(14,7,0,.7) 0%,
+        rgba(14,7,0,.25) 45%,
+        rgba(14,7,0,.85) 100%
+      );
+    }
+
+    .hero-content {
+      position:relative; z-index:2; height:100%;
+      display:flex; flex-direction:column; justify-content:flex-end;
+      padding:0 56px 92px; max-width:1400px; margin:0 auto;
+    }
+
+    .hero-badge {
+      display:inline-flex; align-items:center; gap:10px;
+      border:1px solid rgba(245,158,11,.4);
+      background:rgba(245,158,11,.1);
+      color:var(--yellow-lt); font-family:'Oswald',sans-serif;
+      font-size:11px; font-weight:500; letter-spacing:3px; text-transform:uppercase;
+      padding:8px 18px; width:fit-content; border-radius:4px; margin-bottom:28px;
+      opacity:0; transform:translateY(14px);
+      transition:opacity .6s .3s, transform .6s .3s;
+    }
+    #hero.on .hero-badge { opacity:1; transform:translateY(0); }
+    .badge-dot { width:7px; height:7px; border-radius:50%; background:var(--yellow); animation:blink 1.8s ease infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    .hero-title {
+      font-family:'Oswald',sans-serif; font-weight:700;
+      font-size:clamp(64px, 11vw, 152px);
+      line-height:.9; letter-spacing:2px; text-transform:uppercase;
+      margin-bottom:36px;
+    }
+    .hero-title .line { display:block; overflow:hidden; }
+    .hero-title .line span {
+      display:block; transform:translateY(110%);
+      transition:transform .85s cubic-bezier(.16,1,.3,1);
+    }
+    #hero.on .hero-title .line:nth-child(1) span { transform:translateY(0); transition-delay:.38s; }
+    #hero.on .hero-title .line:nth-child(2) span { transform:translateY(0); transition-delay:.52s; }
+    #hero.on .hero-title .line:nth-child(3) span { transform:translateY(0); transition-delay:.66s; }
+    .hero-title .col-r { color:var(--red); }
+    .hero-title .col-g { color:var(--green); }
+    .hero-title .col-y { color:var(--yellow); }
+
+    .hero-bottom {
+      display:flex; align-items:center; gap:48px; flex-wrap:wrap;
+      opacity:0; transform:translateY(14px);
+      transition:opacity .7s 1s, transform .7s 1s;
+    }
+    #hero.on .hero-bottom { opacity:1; transform:translateY(0); }
+    .hero-sub { font-size:16px; color:var(--text-2); line-height:1.75; max-width:360px; }
+    .hero-ctas { display:flex; gap:14px; flex-wrap:wrap; }
+
+    .btn-red {
+      display:inline-flex; align-items:center; gap:9px;
+      background:var(--red); color:white;
+      font-family:'Oswald',sans-serif; font-size:14px; font-weight:600;
+      letter-spacing:2px; text-transform:uppercase;
+      padding:15px 32px; border-radius:4px;
+      text-decoration:none; cursor:none;
+      transition:background .2s, transform .2s;
+    }
+    .btn-red:hover { background:var(--red-dark); transform:translateY(-2px); }
+
+    .btn-green {
+      display:inline-flex; align-items:center; gap:9px;
+      background:var(--green); color:white;
+      font-family:'Oswald',sans-serif; font-size:14px; font-weight:600;
+      letter-spacing:2px; text-transform:uppercase;
+      padding:15px 32px; border-radius:4px;
+      text-decoration:none; cursor:none;
+      transition:background .2s, transform .2s;
+    }
+    .btn-green:hover { background:var(--green-dk); transform:translateY(-2px); }
+
+    .btn-outline {
+      display:inline-flex; align-items:center; gap:9px;
+      border:1.5px solid rgba(255,248,240,.3); color:var(--text-2);
+      font-family:'Oswald',sans-serif; font-size:14px; font-weight:600;
+      letter-spacing:2px; text-transform:uppercase;
+      padding:15px 32px; border-radius:4px;
+      text-decoration:none; cursor:none;
+      transition:border-color .2s, transform .2s;
+    }
+    .btn-outline:hover { border-color:rgba(255,248,240,.7); transform:translateY(-2px); }
+
+    /* scroll ind */
+    .s-ind {
+      position:absolute; bottom:28px; right:56px; z-index:2;
+      display:flex; flex-direction:column; align-items:center; gap:7px;
+      opacity:0; transition:opacity .6s 1.6s;
+    }
+    #hero.on .s-ind { opacity:1; }
+    .s-ind span { font-family:'Oswald',sans-serif; font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); writing-mode:vertical-rl; }
+    .s-ln { width:1px; height:52px; background:var(--grey); overflow:hidden; position:relative; }
+    .s-ln::after { content:''; position:absolute; top:0; left:0; width:100%; height:40%; background:var(--yellow); animation:sdown 1.8s ease infinite; }
+    @keyframes sdown { 0%{top:-40%} 100%{top:140%} }
+
+    /* ── MARQUEE ── */
+    .mq-band { background:var(--red); padding:14px 0; overflow:hidden; }
+    .mq-track { display:flex; width:max-content; animation:mq 22s linear infinite; }
+    .mq-track:hover { animation-play-state:paused; }
+    @keyframes mq { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+    .mq-item { display:flex; align-items:center; gap:20px; padding:0 24px; white-space:nowrap; }
+    .mq-item span {
+      font-family:'Oswald',sans-serif; font-size:18px; font-weight:600;
+      letter-spacing:3px; text-transform:uppercase; color:var(--yellow-lt);
+    }
+    .mq-dot { width:5px; height:5px; border-radius:50%; background:rgba(252,211,77,.4); flex-shrink:0; }
+
+    /* ── GHOST LABEL ── */
+    .ghost {
+      font-family:'Oswald',sans-serif; font-weight:700;
+      font-size:clamp(64px,12vw,168px);
+      letter-spacing:6px; text-transform:uppercase;
+      color:transparent;
+      -webkit-text-stroke:1px rgba(255,248,240,.06);
+      line-height:1; user-select:none; pointer-events:none;
+    }
+
+    /* ── MENU BLOCKS ── */
+    .menu-block {
+      display:grid; grid-template-columns:1fr 1fr;
+      min-height:560px; overflow:hidden; margin-bottom:3px;
+    }
+    .menu-block:nth-child(even) .mb-img { order:2; }
+    .menu-block:nth-child(even) .mb-txt { order:1; }
+
+    .mb-img { position:relative; overflow:hidden; }
+    .mb-img img {
+      width:100%; height:100%; object-fit:cover;
+      transition:transform .85s cubic-bezier(.25,.46,.45,.94);
+    }
+    .menu-block:hover .mb-img img { transform:scale(1.05); }
+    .mb-img-ov { position:absolute; inset:0; background:rgba(14,7,0,.2); transition:background .35s; }
+    .menu-block:hover .mb-img-ov { background:rgba(14,7,0,.05); }
+
+    .mb-txt {
+      background:var(--black-2); padding:72px;
+      display:flex; flex-direction:column; justify-content:center;
+      position:relative;
+    }
+    .mb-num {
+      font-family:'Oswald',sans-serif; font-size:100px; font-weight:700;
+      color:rgba(255,248,240,.04); position:absolute;
+      top:16px; right:24px; line-height:1; letter-spacing:2px;
+    }
+    .mb-eyebrow {
+      display:flex; align-items:center; gap:10px;
+      font-family:'Oswald',sans-serif; font-size:11px; font-weight:600;
+      letter-spacing:3px; text-transform:uppercase; margin-bottom:16px;
+    }
+    .mb-eyebrow::before { content:''; display:block; width:22px; height:2px; }
+    .ey-r { color:var(--red); } .ey-r::before { background:var(--red); }
+    .ey-g { color:var(--green); } .ey-g::before { background:var(--green); }
+    .ey-y { color:var(--yellow); } .ey-y::before { background:var(--yellow); }
+
+    .mb-name {
+      font-family:'Oswald',sans-serif; font-weight:700;
+      font-size:clamp(38px,4vw,56px);
+      letter-spacing:2px; text-transform:uppercase;
+      margin-bottom:18px; line-height:1;
+    }
+    .mb-name .r { color:var(--red); }
+    .mb-name .g { color:var(--green); }
+    .mb-name .y { color:var(--yellow); }
+
+    .mb-desc { font-size:15px; color:var(--muted-lt); line-height:1.85; margin-bottom:32px; max-width:420px; }
+    .mb-tags { display:flex; flex-wrap:wrap; gap:8px; }
+    .mb-tag {
+      font-family:'Oswald',sans-serif; font-size:11px; font-weight:500;
+      letter-spacing:2px; text-transform:uppercase;
+      padding:6px 14px; border-radius:4px; border:1px solid;
+      transition:background .2s;
+    }
+    .tag-r { color:var(--red); border-color:rgba(220,38,38,.3); }
+    .tag-r:hover { background:rgba(220,38,38,.1); }
+    .tag-g { color:var(--green); border-color:rgba(22,163,74,.3); }
+    .tag-g:hover { background:rgba(22,163,74,.1); }
+    .tag-y { color:var(--yellow); border-color:rgba(245,158,11,.3); }
+    .tag-y:hover { background:rgba(245,158,11,.1); }
+
+    /* ── MENU STRIP ── */
+    #menu { padding:100px 0; background:var(--black-2); }
+    .strip-hdr {
+      padding:0 52px; max-width:1400px; margin:0 auto 52px;
+      display:flex; align-items:flex-end; justify-content:space-between; gap:24px;
+    }
+    .drag-hint {
+      display:flex; align-items:center; gap:10px;
+      font-family:'Oswald',sans-serif; font-size:12px; font-weight:500;
+      letter-spacing:2px; text-transform:uppercase; color:var(--muted);
+    }
+    .drag-hint svg { width:18px; height:18px; color:var(--yellow); }
+
+    .m-strip {
+      display:flex; gap:3px; padding:8px 52px 24px;
+      overflow-x:scroll; cursor:grab; scrollbar-width:none;
+    }
+    .m-strip:active { cursor:grabbing; }
+    .m-strip::-webkit-scrollbar { display:none; }
+
+    .dish-card {
+      flex-shrink:0; width:clamp(220px,20vw,300px);
+      background:var(--black-3); overflow:hidden;
+      cursor:none; transition:transform .28s, box-shadow .28s;
+    }
+    .dish-card:hover { transform:translateY(-6px); box-shadow:0 16px 36px rgba(0,0,0,.5); }
+    .dish-img { width:100%; height:200px; overflow:hidden; }
+    .dish-img img {
+      width:100%; height:100%; object-fit:cover;
+      transition:transform .6s cubic-bezier(.25,.46,.45,.94);
+      pointer-events:none;
+    }
+    .dish-card:hover .dish-img img { transform:scale(1.08); }
+    .dish-body { padding:18px; }
+    .dish-name {
+      font-family:'Oswald',sans-serif; font-size:18px; font-weight:600;
+      letter-spacing:1px; text-transform:uppercase; margin-bottom:6px;
+    }
+    .dish-desc { font-size:12px; color:var(--muted-lt); line-height:1.6; margin-bottom:14px; }
+    .dish-footer { display:flex; align-items:center; justify-content:space-between; }
+    .dish-price {
+      font-family:'Oswald',sans-serif; font-size:22px; font-weight:700; color:var(--yellow);
+    }
+    .dish-price span { font-size:12px; font-family:'Karla',sans-serif; color:var(--muted); margin-left:2px; }
+    .dish-btn {
+      width:34px; height:34px; background:var(--grey);
+      border-radius:50%; display:flex; align-items:center; justify-content:center;
+      cursor:none; transition:background .2s;
+    }
+    .dish-btn:hover { background:var(--red); }
+    .dish-btn svg { width:14px; height:14px; color:var(--text-2); }
+
+    /* ── ABOUT ── */
+    #about {
+      display:grid; grid-template-columns:1fr 1fr;
+      min-height:640px;
+    }
+    .about-img { position:relative; overflow:hidden; }
+    .about-img img { width:100%; height:100%; object-fit:cover; }
+    .about-img-ov {
+      position:absolute; inset:0;
+      background:linear-gradient(to right, transparent 55%, var(--black-3));
+    }
+    .about-content {
+      background:var(--black-3); padding:100px 80px 100px 64px;
+      display:flex; flex-direction:column; justify-content:center;
+    }
+    .about-quote {
+      font-family:'Oswald',sans-serif; font-weight:700;
+      font-size:clamp(30px,3.5vw,46px);
+      letter-spacing:2px; text-transform:uppercase;
+      line-height:1.1; margin:20px 0 28px;
+    }
+    .about-quote .r { color:var(--red); }
+    .about-quote .g { color:var(--green); }
+    .about-quote .y { color:var(--yellow); }
+    .about-body { font-size:15px; color:var(--muted-lt); line-height:1.9; margin-bottom:36px; max-width:460px; }
+    .tricolor-small { width:64px; height:3px; display:flex; margin-bottom:28px; }
+    .tricolor-small .t-g { flex:1; background:var(--green); }
+    .tricolor-small .t-w { flex:1; background:rgba(255,248,240,.5); }
+    .tricolor-small .t-r { flex:1; background:var(--red); }
+
+    /* ── HOURS + LOCATION ── */
+    #info { display:grid; grid-template-columns:1fr 1fr; min-height:520px; }
+
+    .hours-side {
+      background:var(--green); padding:80px;
+      display:flex; flex-direction:column; justify-content:center;
+    }
+    .hours-eyebrow {
+      font-family:'Oswald',sans-serif; font-size:11px; font-weight:600;
+      letter-spacing:3px; text-transform:uppercase;
+      color:rgba(255,255,255,.6); margin-bottom:24px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .hours-eyebrow::before { content:''; display:block; width:22px; height:2px; background:rgba(255,255,255,.5); }
+    .hours-title {
+      font-family:'Oswald',sans-serif; font-size:clamp(40px,5vw,64px); font-weight:700;
+      letter-spacing:2px; text-transform:uppercase; color:white; margin-bottom:36px; line-height:1.15;
+    }
+    .hours-list { display:flex; flex-direction:column; gap:0; }
+    .hours-row {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:12px 0; border-bottom:1px solid rgba(255,255,255,.12);
+    }
+    .hours-row:last-child { border-bottom:none; }
+    .hours-day { font-family:'Oswald',sans-serif; font-size:14px; font-weight:500; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.7); }
+    .hours-time { font-family:'Oswald',sans-serif; font-size:15px; font-weight:600; letter-spacing:1px; color:white; }
+    .hours-closed { color:rgba(255,255,255,.35); font-style:italic; font-size:13px; font-family:'Karla',sans-serif; }
+
+    .loc-side {
+      background:var(--red); padding:80px;
+      display:flex; flex-direction:column; justify-content:center; position:relative; overflow:hidden;
+    }
+    /* decorative circles */
+    .loc-side::before {
+      content:''; position:absolute; width:300px; height:300px; border-radius:50%;
+      border:60px solid rgba(255,255,255,.05); bottom:-80px; right:-80px;
+    }
+    .loc-side::after {
+      content:''; position:absolute; width:180px; height:180px; border-radius:50%;
+      border:40px solid rgba(255,255,255,.04); top:-40px; right:60px;
+    }
+    .loc-eyebrow {
+      font-family:'Oswald',sans-serif; font-size:11px; font-weight:600;
+      letter-spacing:3px; text-transform:uppercase;
+      color:rgba(255,255,255,.6); margin-bottom:24px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .loc-eyebrow::before { content:''; display:block; width:22px; height:2px; background:rgba(255,255,255,.5); }
+    .loc-big {
+      font-family:'Oswald',sans-serif; font-weight:700;
+      font-size:clamp(36px,5vw,64px); letter-spacing:2px;
+      text-transform:uppercase; line-height:1; color:white; margin-bottom:40px;
+    }
+    .loc-details { display:flex; flex-direction:column; gap:18px; position:relative; z-index:1; }
+    .loc-row { display:flex; align-items:flex-start; gap:14px; font-size:15px; color:rgba(255,255,255,.85); line-height:1.5; }
+    .loc-row svg { width:18px; height:18px; color:var(--yellow-lt); flex-shrink:0; margin-top:2px; }
+    .loc-row a { color:rgba(255,255,255,.85); text-decoration:none; cursor:none; transition:color .2s; }
+    .loc-row a:hover { color:white; }
+
+    /* ── GALLERY STRIP ── */
+    #gallery { padding:100px 0; overflow:hidden; }
+    .gal-hdr {
+      padding:0 52px; max-width:1400px; margin:0 auto 52px;
+      display:flex; align-items:flex-end; justify-content:space-between; gap:24px;
+    }
+    .g-strip {
+      display:flex; gap:3px; padding:0 52px;
+      overflow-x:scroll; cursor:grab; scrollbar-width:none;
+    }
+    .g-strip:active { cursor:grabbing; }
+    .g-strip::-webkit-scrollbar { display:none; }
+    .g-card {
+      flex-shrink:0; width:clamp(260px,25vw,420px); height:500px;
+      overflow:hidden; position:relative;
+    }
+    .g-card img {
+      width:100%; height:100%; object-fit:cover;
+      transition:transform .7s cubic-bezier(.25,.46,.45,.94);
+      pointer-events:none;
+    }
+    .g-card:hover img { transform:scale(1.06); }
+    .g-card-ov {
+      position:absolute; inset:0;
+      background:linear-gradient(to top, rgba(14,7,0,.9) 0%, transparent 55%);
+      padding:24px; display:flex; flex-direction:column; justify-content:flex-end;
+    }
+    .g-cat {
+      font-family:'Oswald',sans-serif; font-size:10px; font-weight:600;
+      letter-spacing:2.5px; text-transform:uppercase; margin-bottom:6px;
+    }
+    .g-name {
+      font-family:'Oswald',sans-serif; font-size:24px; font-weight:700;
+      letter-spacing:1.5px; text-transform:uppercase; color:white;
+    }
+
+    /* ── CTA BAND ── */
+    .cta-band {
+      background:var(--yellow); padding:80px 52px;
+    }
+    .cta-inner {
+      max-width:1400px; margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between; gap:48px; flex-wrap:wrap;
+    }
+    .cta-eyebrow {
+      font-family:'Oswald',sans-serif; font-size:11px; font-weight:600;
+      letter-spacing:3px; text-transform:uppercase; color:rgba(14,7,0,.6); margin-bottom:10px;
+    }
+    .cta-headline {
+      font-family:'Oswald',sans-serif; font-size:clamp(38px,5vw,60px);
+      font-weight:700; letter-spacing:2px; text-transform:uppercase;
+      color:var(--black); line-height:1.15;
+    }
+    .cta-sub { font-size:15px; color:rgba(14,7,0,.65); margin-top:12px; }
+    .btn-dark {
+      display:inline-flex; align-items:center; gap:10px;
+      background:var(--black); color:var(--yellow-lt);
+      font-family:'Oswald',sans-serif; font-size:14px; font-weight:600;
+      letter-spacing:2px; text-transform:uppercase;
+      padding:16px 36px; border-radius:4px;
+      text-decoration:none; cursor:none; flex-shrink:0;
+      transition:background .2s, transform .2s;
+    }
+    .btn-dark:hover { background:var(--black-3); transform:translateY(-2px); }
+
+    /* ── FOOTER ── */
+    footer { background:var(--black-2); border-top:1px solid rgba(255,248,240,.06); padding:64px 52px 40px; }
+    .footer-top {
+      max-width:1400px; margin:0 auto;
+      display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:60px; margin-bottom:52px;
+    }
+    .f-brand p { font-size:14px; color:var(--muted); line-height:1.8; margin:18px 0 24px; max-width:280px; }
+    .f-socials { display:flex; gap:12px; }
+    .f-soc {
+      width:36px; height:36px; border:1px solid rgba(255,248,240,.1);
+      border-radius:50%; display:flex; align-items:center; justify-content:center;
+      cursor:none; transition:border-color .2s, background .2s;
+      text-decoration:none;
+    }
+    .f-soc:hover { border-color:var(--red); background:rgba(220,38,38,.1); }
+    .f-soc svg { width:15px; height:15px; fill:var(--muted); transition:fill .2s; }
+    .f-soc:hover svg { fill:var(--text); }
+
+    .footer-col h5 {
+      font-family:'Oswald',sans-serif; font-size:12px; font-weight:600;
+      letter-spacing:3px; text-transform:uppercase; color:var(--text); margin-bottom:22px;
+    }
+    .footer-col ul { list-style:none; display:flex; flex-direction:column; gap:12px; }
+    .footer-col ul a, .footer-col ul li {
+      font-size:14px; color:var(--muted-lt); text-decoration:none; cursor:none; transition:color .2s;
+    }
+    .footer-col ul a:hover { color:var(--yellow); }
+
+    /* open/closed indicators */
+    .hours-status { display:flex; align-items:center; gap:6px; }
+    .dot-open { width:7px; height:7px; border-radius:50%; background:var(--green-lt); flex-shrink:0; }
+    .dot-closed { width:7px; height:7px; border-radius:50%; background:var(--red-light); flex-shrink:0; }
+
+    .footer-bottom {
+      max-width:1400px; margin:0 auto;
+      border-top:1px solid rgba(255,248,240,.06); padding-top:28px;
+      display:flex; justify-content:space-between; align-items:center;
+      gap:16px; flex-wrap:wrap;
+    }
+    .footer-bottom p { font-size:13px; color:var(--muted); }
+    .f-links { display:flex; gap:24px; }
+    .f-links a { font-size:12px; color:var(--muted); text-decoration:none; cursor:none; transition:color .2s; }
+    .f-links a:hover { color:var(--text); }
+
+    /* Back to top */
+    #btt {
+      position:fixed; bottom:24px; right:24px; z-index:90;
+      width:46px; height:46px; background:var(--red);
+      border-radius:50%; border:none;
+      display:flex; align-items:center; justify-content:center;
+      cursor:none; opacity:0; transform:translateY(12px);
+      transition:opacity .3s, transform .3s, background .2s;
+      box-shadow:0 4px 16px rgba(220,38,38,.4);
+    }
+    #btt.on { opacity:1; transform:translateY(0); }
+    #btt:hover { background:var(--red-dark); }
+    #btt svg { width:18px; height:18px; color:white; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width:1024px) {
+      #about { grid-template-columns:1fr; }
+      .about-img { height:400px; }
+      .about-img-ov { background:linear-gradient(to top, var(--black-3) 0%, transparent 40%); }
+      .about-content { padding:60px 40px; }
+      #info { grid-template-columns:1fr; }
+      .hours-side, .loc-side { padding:60px 40px; }
+      .footer-top { grid-template-columns:1fr 1fr; gap:40px; }
+    }
+    @media (max-width:768px) {
+      nav { padding:0 20px; }
+      .nav-links, .nav-cta { display:none; }
+      .burger { display:flex; }
+      .hero-content { padding:0 20px 100px; }
+      .s-ind { display:none; }
+      .menu-block { grid-template-columns:1fr; min-height:auto; }
+      .menu-block:nth-child(even) .mb-img,
+      .menu-block:nth-child(even) .mb-txt { order:unset; }
+      .mb-img { height:260px; }
+      .mb-txt { padding:40px 24px; }
+      #menu { padding:64px 0; }
+      .strip-hdr { padding:0 20px; flex-direction:column; align-items:flex-start; }
+      .m-strip { padding:8px 20px 24px; }
+      .cta-band { padding:60px 20px; }
+      .cta-inner { flex-direction:column; align-items:flex-start; }
+      #gallery { padding:64px 0; }
+      .gal-hdr { padding:0 20px; flex-direction:column; align-items:flex-start; }
+      .g-strip { padding:0 20px; }
+      footer { padding:48px 20px 32px; }
+      .footer-top { grid-template-columns:1fr; gap:32px; }
+      .footer-bottom { flex-direction:column; text-align:center; }
+      body { cursor:auto; }
+      #cursor, #cursor-ring { display:none; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      *, *::before, *::after { animation:none !important; transition-duration:.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="cursor"></div>
+  <div id="cursor-ring"></div>
+  <button id="btt" aria-label="Til toppen">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+    </svg>
+  </button>
+
+  <!-- ── NAV ── -->
+  <nav id="nav">
+    <a href="#" class="nav-logo">
+      <div class="logo-icon">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+      </div>
+      <span class="logo-txt"><span class="g">A</span><span class="r">M</span><span class="y">I</span><span class="g">G</span><span class="r">O</span><span class="y">S</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#menu-blocks">Meny</a></li>
+      <li><a href="#about">Om oss</a></li>
+      <li><a href="#info">Åpningstider</a></li>
+      <li><a href="#gallery">Galleri</a></li>
+    </ul>
+    <a href="tel:41382425" class="nav-cta">Ring oss</a>
+    <button class="burger" id="burger" aria-label="Meny">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="mob-nav" id="mob-nav">
+    <a href="#menu-blocks" class="mob-l">Meny</a>
+    <a href="#about" class="mob-l">Om oss</a>
+    <a href="#info" class="mob-l">Åpningstider</a>
+    <a href="#gallery" class="mob-l">Galleri</a>
+    <a href="tel:41382425" class="mob-l">Ring oss</a>
+  </div>
+
+  <!-- ── HERO ── -->
+  <section id="hero">
+    <div class="hero-flag">
+      <div class="hf-g"></div><div class="hf-w"></div><div class="hf-r"></div>
+    </div>
+    <div class="hero-bg">
+      <img
+        src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=1920&q=85"
+        alt="Amigos meksikansk street food Steinkjer"
+        loading="eager"
+        onerror="this.src='https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=1920&q=85'"
+      />
+    </div>
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+      <div class="hero-badge">
+        <div class="badge-dot"></div>
+        Meksikansk street food · Steinkjer
+      </div>
+      <h1 class="hero-title">
+        <span class="line"><span class="col-g">Ekte</span></span>
+        <span class="line"><span class="col-y">Meksikansk</span></span>
+        <span class="line"><span class="col-r">Street Food.</span></span>
+      </h1>
+      <div class="hero-bottom">
+        <p class="hero-sub">Tacos, burritos og mer — lagd med autentiske smaker og lidenskap midt i hjertet av Steinkjer.</p>
+        <div class="hero-ctas">
+          <a href="#menu-blocks" class="btn-red">
+            Se menyen
+            <svg style="width:15px;height:15px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+          <a href="#info" class="btn-green">
+            Åpningstider
+          </a>
+          <a href="tel:41382425" class="btn-outline">
+            Ring 413 82 425
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="s-ind">
+      <div class="s-ln"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ── MARQUEE ── -->
+  <div class="mq-band">
+    <div class="mq-track">
+      <div class="mq-item"><span>Tacos</span><div class="mq-dot"></div></div>
+      <div class="mq-item"><span>Burritos</span><div class="mq-dot"></div></div>
+      <div class="mq-item"><span>Quesadillas</span><div class="mq-dot"></div></div>
+      <div class="mq-item"><span>Nachos</span><div class="mq-dot"></div></div>
+      <div class="mq-item"><span>Guacamole</span><div class="mq-dot"></div></div>
+      <div class="mq-item"><span>Elote</span><div class="mq-dot"></div></div>
+      <div class="mq-item"><span>Limonada</span><div class="mq-dot"></div></div>
+      <div class="mq-item"><span>Kongens Gate 19</span><div class="mq-dot"></div></div>
+      <div class="mq-item"><span>Tacos</span><div class="mq-dot"></div></div>
+      <div class="mq-item"><span>Burritos</span><div class="mq-dot"></div></div>
+      <div class="mq-item"><span>Quesadillas</span><div class="mq-dot"></div></div>
+      <div class="mq-item"><span>Nachos</span><div class="mq-dot"></div></div>
+      <div class="mq-item"><span>Guacamole</span><div class="mq-dot"></div></div>
+      <div class="mq-item"><span>Elote</span><div class="mq-dot"></div></div>
+      <div class="mq-item"><span>Limonada</span><div class="mq-dot"></div></div>
+      <div class="mq-item"><span>Kongens Gate 19</span><div class="mq-dot"></div></div>
+    </div>
+  </div>
+
+  <!-- ── GHOST ── -->
+  <div style="overflow:hidden;padding:56px 52px 0;max-width:1400px;margin:0 auto;">
+    <div class="ghost reveal">MENYEN</div>
+  </div>
+
+  <!-- ── MENU BLOCKS ── -->
+  <section id="menu-blocks" style="padding-top:32px;">
+
+    <div class="menu-block reveal">
+      <div class="mb-img">
+        <img src="https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?w=900&q=80"
+          alt="Tacos" loading="lazy"
+          onerror="this.src='https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?w=900&q=80'"/>
+        <div class="mb-img-ov"></div>
+      </div>
+      <div class="mb-txt">
+        <div class="mb-num">01</div>
+        <div class="mb-eyebrow ey-r">Klassikeren</div>
+        <h3 class="mb-name">Los <span class="r">Tacos</span></h3>
+        <p class="mb-desc">Tre sprø tacos fylt med ekte smaker — al pastor, carne asada eller pollo. Toppet med fersk salsa, koriander, løk og en skvis lime. Autentisk meksikansk på sitt beste.</p>
+        <div class="mb-tags">
+          <span class="mb-tag tag-r">Al Pastor</span>
+          <span class="mb-tag tag-g">Carne Asada</span>
+          <span class="mb-tag tag-y">Pollo</span>
+          <span class="mb-tag tag-r">Veggie</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-block reveal">
+      <div class="mb-img">
+        <img src="https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=900&q=80"
+          alt="Burritos og quesadillas" loading="lazy"
+          onerror="this.src='https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=900&q=80'"/>
+        <div class="mb-img-ov"></div>
+      </div>
+      <div class="mb-txt">
+        <div class="mb-num">02</div>
+        <div class="mb-eyebrow ey-g">Favorittene</div>
+        <h3 class="mb-name">Burritos &amp; <span class="g">Quesadillas</span></h3>
+        <p class="mb-desc">Fylte burritos pakket med ris, bønner, guacamole og din favorittfylling. Eller en gyllen, sprø quesadilla med smeltet ost — enkelt og uimotståelig godt.</p>
+        <div class="mb-tags">
+          <span class="mb-tag tag-g">Signature Burrito</span>
+          <span class="mb-tag tag-y">Quesadilla</span>
+          <span class="mb-tag tag-g">Ekstra guac</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-block reveal">
+      <div class="mb-img">
+        <img src="https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=900&q=80"
+          alt="Nachos og tilbehør" loading="lazy"
+          onerror="this.src='https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=900&q=80'"/>
+        <div class="mb-img-ov"></div>
+      </div>
+      <div class="mb-txt">
+        <div class="mb-num">03</div>
+        <div class="mb-eyebrow ey-y">Tilbehør &amp; småretter</div>
+        <h3 class="mb-name">Nachos &amp; <span class="y">Extras</span></h3>
+        <p class="mb-desc">Sprø nachos med hjemmelaget queso dip og jalapeños, kremet guacamole med chips, eller grillet elote med smør og chili. Perfekt som tilbehør eller selvstendig snack.</p>
+        <div class="mb-tags">
+          <span class="mb-tag tag-y">Nachos con Queso</span>
+          <span class="mb-tag tag-g">Guacamole</span>
+          <span class="mb-tag tag-r">Elote</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── MENU ITEM STRIP ── -->
+  <section id="menu">
+    <div class="strip-hdr">
+      <div>
+        <div class="mb-eyebrow ey-y reveal" style="margin-bottom:10px;">Bestselgere</div>
+        <div class="ghost reveal d1" style="font-size:clamp(44px,6vw,80px);-webkit-text-stroke:1px rgba(255,248,240,.07);">Smak av Mexico</div>
+      </div>
+      <div class="drag-hint reveal d2">
+        <span>Dra for å se mer</span>
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </div>
+    </div>
+
+    <div class="m-strip" id="mstrip">
+
+      <div class="dish-card">
+        <div class="dish-img"><img src="https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?w=500&q=75" alt="Tacos Al Pastor" loading="lazy"/></div>
+        <div class="dish-body">
+          <div class="dish-name" style="color:var(--red)">Tacos Al Pastor</div>
+          <div class="dish-desc">Marinert svin, ananas, koriander, løk og salsa verde — 3 stk</div>
+          <div class="dish-footer">
+            <div class="dish-price">145 <span>NOK</span></div>
+            <div class="dish-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dish-card">
+        <div class="dish-img"><img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=500&q=75" alt="Carne Asada Tacos" loading="lazy"/></div>
+        <div class="dish-body">
+          <div class="dish-name" style="color:var(--yellow)">Carne Asada</div>
+          <div class="dish-desc">Grillet biff, pico de gallo, avokado og limejuice — 3 stk</div>
+          <div class="dish-footer">
+            <div class="dish-price">155 <span>NOK</span></div>
+            <div class="dish-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dish-card">
+        <div class="dish-img"><img src="https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=500&q=75" alt="Signature Burrito" loading="lazy"/></div>
+        <div class="dish-body">
+          <div class="dish-name" style="color:var(--green-lt)">Amigos Burrito</div>
+          <div class="dish-desc">Ris, svarte bønner, guac, rømme, salsa og kjøtt etter valg</div>
+          <div class="dish-footer">
+            <div class="dish-price">175 <span>NOK</span></div>
+            <div class="dish-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dish-card">
+        <div class="dish-img"><img src="https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=500&q=75" alt="Nachos" loading="lazy"/></div>
+        <div class="dish-body">
+          <div class="dish-name" style="color:var(--yellow)">Nachos con Queso</div>
+          <div class="dish-desc">Sprø tortillachips med hjemmelaget ostesaus og jalapeños</div>
+          <div class="dish-footer">
+            <div class="dish-price">110 <span>NOK</span></div>
+            <div class="dish-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dish-card">
+        <div class="dish-img"><img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&q=75" alt="Guacamole" loading="lazy"/></div>
+        <div class="dish-body">
+          <div class="dish-name" style="color:var(--green-lt)">Guacamole &amp; Chips</div>
+          <div class="dish-desc">Kremete hjemmelaget guac med tomatillo, lime og koriander</div>
+          <div class="dish-footer">
+            <div class="dish-price">85 <span>NOK</span></div>
+            <div class="dish-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dish-card">
+        <div class="dish-img"><img src="https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?w=500&q=75" alt="Quesadilla" loading="lazy"/></div>
+        <div class="dish-body">
+          <div class="dish-name" style="color:var(--red)">Quesadilla Pollo</div>
+          <div class="dish-desc">Gyllen tortilla med smeltet ost, grillet kylling og paprika</div>
+          <div class="dish-footer">
+            <div class="dish-price">145 <span>NOK</span></div>
+            <div class="dish-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dish-card">
+        <div class="dish-img"><img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=75" alt="Veggie Tacos" loading="lazy"/></div>
+        <div class="dish-body">
+          <div class="dish-name" style="color:var(--green-lt)">Veggie Tacos</div>
+          <div class="dish-desc">Svarte bønner, grillet mais, paprika, avokado og salsa — 3 stk</div>
+          <div class="dish-footer">
+            <div class="dish-price">135 <span>NOK</span></div>
+            <div class="dish-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── ABOUT ── -->
+  <section id="about">
+    <div class="about-img img-wipe">
+      <img src="https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=900&q=80" alt="Meksikansk mat" loading="lazy"/>
+      <div class="about-img-ov"></div>
+    </div>
+    <div class="about-content textured">
+      <div class="tricolor-small"><div class="t-g"></div><div class="t-w"></div><div class="t-r"></div></div>
+      <div class="mb-eyebrow ey-y reveal">Vår historie</div>
+      <h2 class="about-quote reveal d1">
+        Meksiko<br/>
+        i hjertet av<br/>
+        <span class="g">Steinkjer.</span>
+      </h2>
+      <p class="about-body reveal d2">
+        Amigos bringer ekte meksikansk street food-kultur til Steinkjer. Inspirert av travle gatekjøkken i Mexico City og Oaxaca — der smakene er intense, ingrediensene ferske og stemningen alltid varm.
+      </p>
+      <p class="about-body reveal d3" style="margin-top:-16px;">
+        Vi bruker autentiske oppskrifter, hjemmelagde salsaer og griller kjøttet på tradisjonelt vis. Ingen snarveier. Bare ekte smak fra et ekte hjerte.
+      </p>
+      <a href="#info" class="btn-red reveal d4" style="width:fit-content;">
+        Besøk oss
+        <svg style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- ── HOURS + LOCATION ── -->
+  <section id="info">
+    <div class="hours-side">
+      <div class="hours-eyebrow">Åpningstider</div>
+      <h2 class="hours-title reveal">Når vi er<br/>åpne</h2>
+      <div class="hours-list">
+        <div class="hours-row reveal">
+          <span class="hours-day">
+            <span class="hours-status"><span class="dot-closed"></span>Mandag</span>
+          </span>
+          <span class="hours-closed">Stengt</span>
+        </div>
+        <div class="hours-row reveal d1">
+          <span class="hours-day"><span class="hours-status"><span class="dot-open"></span>Tirsdag</span></span>
+          <span class="hours-time">14:00 – 21:00</span>
+        </div>
+        <div class="hours-row reveal d2">
+          <span class="hours-day"><span class="hours-status"><span class="dot-open"></span>Onsdag</span></span>
+          <span class="hours-time">14:00 – 21:00</span>
+        </div>
+        <div class="hours-row reveal d2">
+          <span class="hours-day"><span class="hours-status"><span class="dot-open"></span>Torsdag</span></span>
+          <span class="hours-time">14:00 – 21:00</span>
+        </div>
+        <div class="hours-row reveal d3">
+          <span class="hours-day"><span class="hours-status"><span class="dot-open"></span>Fredag</span></span>
+          <span class="hours-time">14:00 – 21:00</span>
+        </div>
+        <div class="hours-row reveal d3">
+          <span class="hours-day"><span class="hours-status"><span class="dot-open"></span>Lørdag</span></span>
+          <span class="hours-time">14:00 – 21:00</span>
+        </div>
+        <div class="hours-row reveal d4">
+          <span class="hours-day"><span class="hours-status"><span class="dot-open"></span>Søndag</span></span>
+          <span class="hours-time">14:00 – 21:00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="loc-side">
+      <div class="loc-eyebrow">Finn oss</div>
+      <h2 class="loc-big reveal">Kongens<br/><span style="color:var(--yellow-lt)">Gate 19</span></h2>
+      <div class="loc-details">
+        <div class="loc-row reveal d1">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          <span>Kongens Gate 19<br/>7715 Steinkjer, Norge</span>
+        </div>
+        <div class="loc-row reveal d2">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+          </svg>
+          <a href="tel:41382425">413 82 425</a>
+        </div>
+        <div class="loc-row reveal d3">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>Tirsdag – Søndag<br/>14:00 – 21:00</span>
+        </div>
+        <div class="loc-row reveal d4">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+          </svg>
+          <span>
+            <a href="https://www.facebook.com/p/Amigos-Steinkjer-61587172176423/" target="_blank" rel="noopener">Facebook</a>
+            &nbsp;·&nbsp;
+            <a href="https://www.instagram.com/amigos_steinkjer" target="_blank" rel="noopener">Instagram</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA BAND ── -->
+  <div class="cta-band">
+    <div class="cta-inner">
+      <div>
+        <div class="cta-eyebrow">Ta kontakt</div>
+        <h2 class="cta-headline">Sulten? Vi venter<br/>på deg.</h2>
+        <p class="cta-sub">Stikk innom Kongens Gate 19 – tirsdag til søndag fra klokken 14.</p>
+      </div>
+      <a href="tel:41382425" class="btn-dark">
+        Ring 413 82 425
+        <svg style="width:15px;height:15px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── GALLERY STRIP ── -->
+  <section id="gallery">
+    <div class="gal-hdr">
+      <div>
+        <div class="mb-eyebrow ey-r reveal">Galleri</div>
+        <div class="ghost reveal d1" style="font-size:clamp(40px,5.5vw,80px);-webkit-text-stroke:1px rgba(255,248,240,.06);">Fra kjøkkenet</div>
+      </div>
+      <div class="drag-hint reveal d2">
+        <span>Dra for å utforske</span>
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </div>
+    </div>
+    <div class="g-strip" id="gstrip">
+      <div class="g-card">
+        <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&q=80" alt="Meksikansk mat" loading="lazy"/>
+        <div class="g-card-ov"><div class="g-cat" style="color:var(--red)">Signatur</div><div class="g-name">Amigos Spesial</div></div>
+      </div>
+      <div class="g-card">
+        <img src="https://images.unsplash.com/photo-1629197520328-42544e8b07c7?w=600&q=80" alt="Tacos" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&q=80'"/>
+        <div class="g-card-ov"><div class="g-cat" style="color:var(--yellow)">Klassiker</div><div class="g-name">Los Tacos</div></div>
+      </div>
+      <div class="g-card">
+        <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?w=600&q=80" alt="Grillet kjøtt" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=600&q=80'"/>
+        <div class="g-card-ov"><div class="g-cat" style="color:var(--green-lt)">Fra grillen</div><div class="g-name">Carne Asada</div></div>
+      </div>
+      <div class="g-card">
+        <img src="https://images.unsplash.com/photo-1572441713132-51d27bc4de19?w=600&q=80" alt="Salsas" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=600&q=80'"/>
+        <div class="g-card-ov"><div class="g-cat" style="color:var(--red)">Hjemmelaget</div><div class="g-name">Salsas &amp; Dips</div></div>
+      </div>
+      <div class="g-card">
+        <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=80" alt="Guacamole" loading="lazy"/>
+        <div class="g-card-ov"><div class="g-cat" style="color:var(--green-lt)">Ferskt</div><div class="g-name">Guacamole</div></div>
+      </div>
+      <div class="g-card">
+        <img src="https://images.unsplash.com/photo-1504544750208-dc0358e63f7f?w=600&q=80" alt="Street food stemning" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=600&q=80'"/>
+        <div class="g-card-ov"><div class="g-cat" style="color:var(--yellow)">Atmosfære</div><div class="g-name">Street Food Vibes</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-top">
+      <div class="f-brand">
+        <a href="#" class="nav-logo">
+          <div class="logo-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </div>
+          <span class="logo-txt"><span class="g">A</span><span class="r">M</span><span class="y">I</span><span class="g">G</span><span class="r">O</span><span class="y">S</span></span>
+        </a>
+        <p>Ekte meksikansk street food i hjertet av Steinkjer. Autentiske smaker, ferske råvarer og god stemning — tirsdag til søndag.</p>
+        <div class="f-socials">
+          <a href="https://www.facebook.com/p/Amigos-Steinkjer-61587172176423/" target="_blank" rel="noopener" class="f-soc" aria-label="Facebook">
+            <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/amigos_steinkjer" target="_blank" rel="noopener" class="f-soc" aria-label="Instagram">
+            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Menyen</h5>
+        <ul>
+          <li><a href="#menu-blocks">Los Tacos</a></li>
+          <li><a href="#menu-blocks">Burritos</a></li>
+          <li><a href="#menu-blocks">Quesadillas</a></li>
+          <li><a href="#menu-blocks">Nachos</a></li>
+          <li><a href="#menu-blocks">Guacamole</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Informasjon</h5>
+        <ul>
+          <li><a href="#about">Om Amigos</a></li>
+          <li><a href="#info">Åpningstider</a></li>
+          <li><a href="#gallery">Galleri</a></li>
+          <li><a href="tel:41382425">Ring oss</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Besøk oss</h5>
+        <ul>
+          <li><li>Kongens Gate 19</li></li>
+          <li><li>7715 Steinkjer</li></li>
+          <li><a href="tel:41382425">413 82 425</a></li>
+          <li><li>Tir–Søn: 14–21</li></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Amigos Steinkjer. Alle rettigheter forbeholdt.</p>
+      <div class="f-links">
+        <a href="#">Personvern</a>
+        <a href="#">Vilkår</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ── Custom cursor
+    const cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+    (function loop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
+    document.querySelectorAll('a,button,.dish-card,.g-card,.mb-tag').forEach(el=>{
+      el.addEventListener('mouseenter',()=>document.body.classList.add('cg'));
+      el.addEventListener('mouseleave',()=>document.body.classList.remove('cg'));
+    });
+
+    // ── Navbar
+    const nav=document.getElementById('nav');
+    window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>60),{passive:true});
+
+    // ── Hero load
+    const hero=document.getElementById('hero');
+    const go=()=>hero.classList.add('on');
+    window.addEventListener('load',go); setTimeout(go,150);
+
+    // ── Mobile menu
+    const burger=document.getElementById('burger'),mobNav=document.getElementById('mob-nav');
+    let mOpen=false;
+    burger.addEventListener('click',()=>{
+      mOpen=!mOpen; mobNav.classList.toggle('open',mOpen);
+      const s=burger.querySelectorAll('span');
+      s[0].style.transform=mOpen?'rotate(45deg) translate(5px,5px)':'';
+      s[1].style.opacity=mOpen?'0':'1';
+      s[2].style.transform=mOpen?'rotate(-45deg) translate(5px,-5px)':'';
+    });
+    document.querySelectorAll('.mob-l').forEach(l=>l.addEventListener('click',()=>{
+      mOpen=false; mobNav.classList.remove('open');
+      burger.querySelectorAll('span').forEach(s=>{s.style.transform='';s.style.opacity='';});
+    }));
+
+    // ── Reveal
+    const obs=new IntersectionObserver(entries=>{
+      entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');obs.unobserve(e.target);}});
+    },{threshold:.07,rootMargin:'0px 0px -36px 0px'});
+    document.querySelectorAll('.reveal,.reveal-l,.reveal-r,.img-wipe').forEach(el=>obs.observe(el));
+
+    // ── Drag strips
+    [document.getElementById('mstrip'),document.getElementById('gstrip')].forEach(strip=>{
+      if(!strip) return;
+      let down=false,sx,sl;
+      strip.addEventListener('mousedown',e=>{down=true;sx=e.pageX-strip.offsetLeft;sl=strip.scrollLeft;strip.style.cursor='grabbing';});
+      strip.addEventListener('mouseleave',()=>{down=false;strip.style.cursor='grab';});
+      strip.addEventListener('mouseup',()=>{down=false;strip.style.cursor='grab';});
+      strip.addEventListener('mousemove',e=>{if(!down)return;e.preventDefault();strip.scrollLeft=sl-(e.pageX-strip.offsetLeft-sx)*1.4;});
+      let tx=0,tsl=0;
+      strip.addEventListener('touchstart',e=>{tx=e.touches[0].pageX;tsl=strip.scrollLeft;},{passive:true});
+      strip.addEventListener('touchmove',e=>{strip.scrollLeft=tsl+(tx-e.touches[0].pageX);},{passive:true});
+    });
+
+    // ── Back to top
+    const btt=document.getElementById('btt');
+    window.addEventListener('scroll',()=>btt.classList.toggle('on',scrollY>500),{passive:true});
+    btt.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+    // ── Smooth anchor
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener('click',e=>{
+        const t=document.querySelector(a.getAttribute('href'));
+        if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}
+      });
+    });
+  </script>
+</body>
+</html>
